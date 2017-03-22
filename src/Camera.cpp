@@ -45,6 +45,22 @@ cv::Mat Camera::getDepthImage() const
 	return slMat2cvMat(m_zedCamera->normalizeMeasure(sl::zed::MEASURE::DEPTH));	// DEPTH, CONFIDENCE ou DISPARITY
 }
 
+std::vector<float> Camera::getCloudPoint() const
+{
+	float* data = (float*) m_zedCamera->retrieveMeasure(sl::zed::MEASURE::XYZRGBA).data;
+	return {data, data + getImageSize().width * getImageSize().height * 4};
+}
+
+sl::zed::Mat Camera::getGPUCloudPoint() const
+{
+	return m_zedCamera->retrieveMeasure_gpu(sl::zed::MEASURE::XYZRGBA);
+}
+
+CUcontext Camera::getCudaContext() const
+{
+	return m_zedCamera->getCUDAContext();
+}
+
 void Camera::recreate(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE depthQuality, int maximumDepthDistance, const std::string& file)
 {
 	if (m_canRecord)
@@ -108,6 +124,7 @@ void Camera::initialize(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE de
 	m_parameters.unit = sl::zed::UNIT::MILLIMETER;
 	m_parameters.verbose = 1;
 	m_parameters.device = 0;
+	m_parameters.coordinate = sl::zed::COORDINATE_SYSTEM::RIGHT_HANDED;
 
 
 	// Initialisation de la camera

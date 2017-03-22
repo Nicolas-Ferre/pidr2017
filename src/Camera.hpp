@@ -27,6 +27,12 @@ public :
 	
 	cv::Mat getDepthImage() const;
 
+	std::vector<float> getCloudPoint() const;
+
+	sl::zed::Mat getGPUCloudPoint() const;
+
+	CUcontext getCudaContext() const;
+
 	void recreate(sl::zed::ZEDResolution_mode resolution = sl::zed::ZEDResolution_mode::VGA,
 		sl::zed::MODE depthQuality = sl::zed::MODE::QUALITY, int maximumDepthDistance = 10000, const std::string& file = "");
 
@@ -40,10 +46,12 @@ public :
 
 	void resetReading();
 
+	sl::zed::Camera* m_zedCamera;
+
 private:
 	void initialize(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE depthQuality, int maximumDepthDistance, const std::string& file);
 
-	sl::zed::Camera* m_zedCamera;
+	
 	bool m_canRecord;
 	bool m_isRecording;
 	sl::zed::InitParams m_parameters;
