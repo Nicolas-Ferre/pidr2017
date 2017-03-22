@@ -57,7 +57,7 @@ def takepicture(x,y,theta):
     lgt=len(data.tranche);
     i=0;
     for fl in data.tranche:
-        if fl<7.5:
+        if fl<10:
             xt.append(x+(-fl*np.cos(35/180*np.pi+np.pi*i*110/(lgt*180)+35./180*np.pi + theta)));
             yt.append(y+(fl*np.sin(35/180*np.pi+np.pi*i*110/(lgt*180)+35./180*np.pi + theta)));
         i=i+1;

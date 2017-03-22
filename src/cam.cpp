@@ -32,12 +32,14 @@ int main(int argc, char **argv)
 	srand(time(0));
 
 	// Initialisation de l'affichage
-	Camera camera;
+	Camera camera(sl::zed::ZEDResolution_mode::VGA, sl::zed::MODE::QUALITY, 10000, "test.svo");
+	//camera.enableRecording("test.svo");
 	int width = camera.getImageSize().width;
 	int height = camera.getImageSize().height;
 	cv::Size size(width, height); // taille de l'image
 
 	cv::Mat depthImage(size, CV_8UC1); // image de profondeur
+	cv::Mat colorImage(size, CV_8UC3); // image de profondeur
 
 
 	// Boucle d'affichage
@@ -53,6 +55,7 @@ int main(int argc, char **argv)
 		// Récupération des informations de la caméra
 		camera.update();
 		camera.getDepthImage().copyTo(depthImage);
+		camera.getLeftColorImage().copyTo(colorImage);
 
 
 		// Récupération de la profondeur de la ligne horizontale centrale
@@ -70,12 +73,19 @@ int main(int argc, char **argv)
 			depthImage.at<cv::Vec4b>(cv::Point(i, height / 2)) = cv::Vec4b(255, 0, 0, 255);
 
 		cv::imshow("Profondeur", depthImage);
+		//cv::imshow("Couleur", colorImage);
 
 
 		// Récupération des inputs
 		char key = cv::waitKey(5);
 		if (key == 'q')
 			break;
+		else if (key == 'r')
+			camera.startRecording();
+		else if (key == 's')
+			camera.stopRecording();
+		else if (key == 'l')
+			camera.recreate(sl::zed::ZEDResolution_mode::VGA, sl::zed::MODE::QUALITY, 10000, "test.svo");
 
 
 		// Calcul des FPS

@@ -11,7 +11,7 @@ class Camera
 {
 public :
 	Camera(sl::zed::ZEDResolution_mode resolution = sl::zed::ZEDResolution_mode::VGA,
-		sl::zed::MODE depthQuality = sl::zed::MODE::QUALITY, int maximumDepthDistance = 10000);
+		sl::zed::MODE depthQuality = sl::zed::MODE::QUALITY, int maximumDepthDistance = 10000, const std::string& file = "");
 	
 	~Camera();
 	
@@ -26,15 +26,28 @@ public :
 	cv::Mat getRightColorImage() const;
 	
 	cv::Mat getDepthImage() const;
-	
-	sl::zed::Camera* getCamera();
-	
+
+	void recreate(sl::zed::ZEDResolution_mode resolution = sl::zed::ZEDResolution_mode::VGA,
+		sl::zed::MODE depthQuality = sl::zed::MODE::QUALITY, int maximumDepthDistance = 10000, const std::string& file = "");
+
 	void update();
 
+	void enableRecording(const std::string& file);
+
+	void startRecording();
+
+	void stopRecording();
+
+	void resetReading();
+
 private:
-	void initialize(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE depthQuality, int maximumDepthDistance);
+	void initialize(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE depthQuality, int maximumDepthDistance, const std::string& file);
 
 	sl::zed::Camera* m_zedCamera;
+	bool m_canRecord;
+	bool m_isRecording;
+	sl::zed::InitParams m_parameters;
+	std::string m_readFile;
 };
 
 #endif

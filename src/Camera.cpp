@@ -1,12 +1,18 @@
 #include "Camera.hpp"
 
-Camera::Camera(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE depthQuality, int maximumDepthDistance)
+Camera::Camera(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE depthQuality, int maximumDepthDistance, const std::string& file) :
+	m_canRecord(false),
+	m_isRecording(false),
+	m_readFile(file)
 {
-	initialize(resolution, depthQuality, maximumDepthDistance);
+	initialize(resolution, depthQuality, maximumDepthDistance, file);
 }
 
 Camera::~Camera()
 {
+	if (m_canRecord)
+		m_zedCamera->stopRecording();
+	delete m_zedCamera;
 }
 
 sl::zed::resolution Camera::getImageSize() const
@@ -28,7 +34,7 @@ cv::Mat Camera::getLeftColorImage() const
 {
 	return slMat2cvMat(m_zedCamera->retrieveImage(sl::zed::SIDE::LEFT));
 }
-	
+
 cv::Mat Camera::getRightColorImage() const
 {
 	return slMat2cvMat(m_zedCamera->retrieveImage(sl::zed::SIDE::RIGHT));
@@ -39,38 +45,85 @@ cv::Mat Camera::getDepthImage() const
 	return slMat2cvMat(m_zedCamera->normalizeMeasure(sl::zed::MEASURE::DEPTH));	// DEPTH, CONFIDENCE ou DISPARITY
 }
 
-sl::zed::Camera* Camera::getCamera()
+void Camera::recreate(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE depthQuality, int maximumDepthDistance, const std::string& file)
 {
-	return m_zedCamera;
+	if (m_canRecord)
+		m_zedCamera->stopRecording();
+	delete m_zedCamera;
+
+	m_canRecord = false;
+	m_isRecording = false;
+	m_readFile = file;
+	initialize(resolution, depthQuality, maximumDepthDistance, file);
 }
 
 void Camera::update()
 {
-	m_zedCamera->grab(sl::zed::SENSING_MODE::FILL);	// STANDARD ou FILL
+	if (!m_canRecord)
+	{
+		if (m_readFile == "")
+		{
+			m_zedCamera->grab(sl::zed::SENSING_MODE::FILL);	// STANDARD ou FILL
+		}
+		else
+		{
+			m_zedCamera->setSVOPosition(m_zedCamera->getSVOPosition() + 1);
+			m_zedCamera->grab(sl::zed::SENSING_MODE::FILL);
+		}
+	}
+	else
+	{
+		if (!m_zedCamera->grab(sl::zed::SENSING_MODE::FILL) && m_isRecording)	// STANDARD ou FILL
+		{
+			m_zedCamera->record();
+		}
+	}
 }
 
-void Camera::initialize(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE depthQuality, int maximumDepthDistance)
+void Camera::enableRecording(const std::string& file)
+{
+	m_zedCamera->enableRecording(file, sl::zed::LOSSLESS_BASED);
+	m_canRecord = true;
+}
+
+void Camera::startRecording()
+{
+	m_isRecording = true;
+}
+
+void Camera::stopRecording()
+{
+	m_isRecording = false;
+}
+
+void Camera::resetReading()
+{
+	m_zedCamera->setSVOPosition(0);
+}
+
+void Camera::initialize(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE depthQuality, int maximumDepthDistance, const std::string& file)
 {
 	// Initialisation des parametres
-        sl::zed::InitParams parameters;
-        parameters.mode = sl::zed::MODE::QUALITY;        // NONE, PERFORMANCE, MEDIUM ou QUALITY
-        parameters.unit = sl::zed::UNIT::MILLIMETER;
-        parameters.verbose = 1;
-        parameters.device = 0;
-        
-        
-        // Initialisation de la camera
-        m_zedCamera = new sl::zed::Camera(sl::zed::ZEDResolution_mode::VGA);	// VGA, HD720, HD1080 ou HD2K
-        sl::zed::ERRCODE err = m_zedCamera->init(parameters);
-        
-        if (err != sl::zed::ERRCODE::SUCCESS)
-        {
-                // on quitte le programmme en cas d'erreur
-                std::cout << errcode2str(err) << std::endl;
-                delete m_zedCamera;
-                exit(1);
-        }
-        
-        m_zedCamera->setDepthClampValue(maximumDepthDistance);
-}
+	m_parameters.mode = sl::zed::MODE::QUALITY;        // NONE, PERFORMANCE, MEDIUM ou QUALITY
+	m_parameters.unit = sl::zed::UNIT::MILLIMETER;
+	m_parameters.verbose = 1;
+	m_parameters.device = 0;
 
+
+	// Initialisation de la camera
+	if (file != "")
+		m_zedCamera = new sl::zed::Camera(file);
+	else
+		m_zedCamera = new sl::zed::Camera(sl::zed::ZEDResolution_mode::VGA);	// VGA, HD720, HD1080 ou HD2K
+	sl::zed::ERRCODE err = m_zedCamera->init(m_parameters);
+
+	if (err != sl::zed::ERRCODE::SUCCESS)
+	{
+		// on quitte le programmme en cas d'erreur
+		std::cout << errcode2str(err) << std::endl;
+		delete m_zedCamera;
+		exit(1);
+	}
+
+	m_zedCamera->setDepthClampValue(maximumDepthDistance);
+}
