@@ -177,11 +177,6 @@ add_executable(
 	cam src/cam.cpp
 	src/Camera.cpp
 	src/FpsCounter.cpp 
-	src/PointCloudViewer/CameraGL.cpp
-	src/PointCloudViewer/PointCloud.cpp
-	src/PointCloudViewer/Shader.cpp
-	src/PointCloudViewer/Simple3DObject.cpp
-	src/PointCloudViewer/Viewer.cpp
 	)
 
 add_dependencies(cam beginner_tutorials_gencpp)

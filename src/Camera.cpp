@@ -12,7 +12,13 @@ Camera::~Camera()
 {
 	if (m_canRecord)
 		m_zedCamera->stopRecording();
-	delete m_zedCamera;
+	if (m_zedCamera != nullptr)
+		delete m_zedCamera;
+}
+
+bool Camera::canRecord() const
+{
+	return m_canRecord;
 }
 
 sl::zed::resolution Camera::getImageSize() const
@@ -75,24 +81,12 @@ void Camera::recreate(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE dept
 
 void Camera::update()
 {
-	if (!m_canRecord)
+	if (!m_zedCamera->grab(sl::zed::SENSING_MODE::STANDARD))
 	{
-		if (m_readFile == "")
-		{
-			m_zedCamera->grab(sl::zed::SENSING_MODE::FILL);	// STANDARD ou FILL
-		}
-		else
-		{
+		if (!m_canRecord && m_readFile != "")	// vraie camera
 			m_zedCamera->setSVOPosition(m_zedCamera->getSVOPosition() + 1);
-			m_zedCamera->grab(sl::zed::SENSING_MODE::FILL);
-		}
-	}
-	else
-	{
-		if (!m_zedCamera->grab(sl::zed::SENSING_MODE::FILL) && m_isRecording)	// STANDARD ou FILL
-		{
+		else if (m_canRecord && m_isRecording)	// enregistrement
 			m_zedCamera->record();
-		}
 	}
 }
 
@@ -139,6 +133,7 @@ void Camera::initialize(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE de
 		// on quitte le programmme en cas d'erreur
 		std::cout << errcode2str(err) << std::endl;
 		delete m_zedCamera;
+		std::cout << "Rage quit" << std::endl;
 		exit(1);
 	}
 

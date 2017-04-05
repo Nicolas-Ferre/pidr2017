@@ -14,6 +14,8 @@ public :
 		sl::zed::MODE depthQuality = sl::zed::MODE::QUALITY, int maximumDepthDistance = 10000, const std::string& file = "");
 	
 	~Camera();
+
+	bool canRecord() const;
 	
 	sl::zed::resolution getImageSize() const;
 	

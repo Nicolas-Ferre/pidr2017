@@ -4,12 +4,6 @@
 #include "Camera.hpp"
 #include "Service.hpp"
 #include "FpsCounter.hpp"
-#include "ros/ros.h"
-#include "std_msgs/String.h"
-#include "std_msgs/Float32MultiArray.h"
-#include "beginner_tutorials/CamToAlg.h"
-#include "PointCloudViewer/Viewer.hpp"
-#include "PointCloudViewer/PointCloud.hpp"
 
 int lineDepthFrame = 0;
 std::vector<std::vector<float>> lineDepth;
@@ -34,8 +28,10 @@ int main(int argc, char **argv)
 	srand(time(0));
 
 	// Initialisation de l'affichage
-	Camera camera(sl::zed::ZEDResolution_mode::VGA, sl::zed::MODE::QUALITY, 10000/*, "test.svo"*/);
-	//camera.enableRecording("test.svo");
+	bool isRecording = false;
+	std::string file = "test.svo";
+
+	Camera camera(sl::zed::ZEDResolution_mode::VGA, sl::zed::MODE::QUALITY, 10000);
 	int width = camera.getImageSize().width;
 	int height = camera.getImageSize().height;
 	cv::Size size(width, height); // taille de l'image
@@ -52,26 +48,11 @@ int main(int argc, char **argv)
 
 	lineDepth = std::vector<std::vector<float>>(20, std::vector<float>(width, 0));
 
-	sl::zed::Mat bufferXYZRGBA;
-	PointCloud cloud(width, height, camera.getCudaContext());
-	//Viewer viewer(cloud, argc, argv);
-
-	//while (!viewer.isInitialized());
-
 	while (ros::ok()/* && !viewer.isEnded()*/)
 	{
 		// Récupération des informations de la caméra
 		camera.update();
 		camera.getDepthImage().copyTo(depthImage);
-		camera.getLeftColorImage().copyTo(colorImage);
-		std::vector<float> cloudPoints = camera.getCloudPoint();
-
-		/*bufferXYZRGBA = camera.getGPUCloudPoint();
-
-		if (cloud.mutexData.try_lock()) {
-			cloud.pushNewPC(bufferXYZRGBA);
-			cloud.mutexData.unlock();
-		}*/
 
 
 		// Récupération de la profondeur de la ligne horizontale centrale
@@ -97,11 +78,18 @@ int main(int argc, char **argv)
 		if (key == 'q')
 			break;
 		else if (key == 'r')
+		{
+			if (!camera.canRecord())
+			{
+				camera.recreate(sl::zed::ZEDResolution_mode::VGA, sl::zed::MODE::QUALITY, 10000);
+				camera.enableRecording(file);
+			}
 			camera.startRecording();
+		}
 		else if (key == 's')
 			camera.stopRecording();
 		else if (key == 'l')
-			camera.recreate(sl::zed::ZEDResolution_mode::VGA, sl::zed::MODE::QUALITY, 10000, "test.svo");
+			camera.recreate(sl::zed::ZEDResolution_mode::VGA, sl::zed::MODE::QUALITY, 10000, file);
 
 
 		// Calcul des FPS
@@ -111,7 +99,6 @@ int main(int argc, char **argv)
 			std::cout << "FPS : " << (int)fpsCounter.getFps() << std::endl;
 	}
 
-	//viewer.destroy();
 	return 0;
 }
 
