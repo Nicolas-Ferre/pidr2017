@@ -176,8 +176,12 @@ include_directories(
 add_executable(
 	cam src/cam.cpp
 	src/Camera.cpp
-	src/FpsCounter.cpp 
-	)
+	src/FpsCounter.cpp
+	src/AbstractProgram.cpp
+    src/ReadProgram.cpp
+    src/RecordProgram.cpp
+	src/Send2DMapProgram.cpp
+)
 
 add_dependencies(cam beginner_tutorials_gencpp)
 #############
@@ -226,7 +230,7 @@ IF(WIN32) # Windows
      if ( CMAKE_SYSTEM_NAME2 MATCHES "aarch64" OR CMAKE_SYSTEM_NAME2 MATCHES "armv7l" )
         SET(VERSION_REQ_OCV "2.4")
         SET(VERSION_REQ_CUDA "")
-        link_directories("/usr/lib/aarch64-linux-gnu/tegra") 
+        link_directories("/usr/lib/aarch64-linux-gnu/tegra")
      endif()
      SET(SPECIAL_OS_LIBS "pthread" "X11")
 
@@ -241,10 +245,10 @@ IF(WIN32) # Windows
         endif()
 
 ENDIF(WIN32)
- 
+
 find_package(OpenCV ${VERSION_REQ_OCV} REQUIRED)
 find_package(CUDA ${VERSION_REQ_CUDA} REQUIRED)
- 
+
 include_directories(${ZED_INCLUDE_DIRS})
 include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${GLEW_INCLUDE_DIRS})

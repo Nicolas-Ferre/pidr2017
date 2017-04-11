@@ -1,11 +1,14 @@
 #include "Camera.hpp"
 
-Camera::Camera(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE depthQuality, int maximumDepthDistance, const std::string& file) :
+Camera::Camera(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE depthQuality, int maximumDepthDistance,
+	const std::string& readFile) :
 	m_canRecord(false),
 	m_isRecording(false),
-	m_readFile(file)
+	m_readFile(readFile),
+	m_isPlayingStreaming(false),
+	m_lastImagePosition(0)
 {
-	initialize(resolution, depthQuality, maximumDepthDistance, file);
+	initialize(resolution, depthQuality, maximumDepthDistance, readFile);
 }
 
 Camera::~Camera()
@@ -21,9 +24,22 @@ bool Camera::canRecord() const
 	return m_canRecord;
 }
 
-sl::zed::resolution Camera::getImageSize() const
+bool Camera::isRecording() const
 {
-	return m_zedCamera->getImageSize();
+	return m_isRecording;
+}
+
+bool Camera::isPlayingStreaming() const
+{
+	return m_isPlayingStreaming;
+}
+
+cv::Size Camera::getImageSize() const
+{
+	int width = m_zedCamera->getImageSize().width;
+	int height = m_zedCamera->getImageSize().height;
+
+	return cv::Size(width, height);
 }
 
 int Camera::getMaximumDepthDistance() const
@@ -83,10 +99,15 @@ void Camera::update()
 {
 	if (!m_zedCamera->grab(sl::zed::SENSING_MODE::STANDARD))
 	{
-		if (!m_canRecord && m_readFile != "")	// vraie camera
-			m_zedCamera->setSVOPosition(m_zedCamera->getSVOPosition() + 1);
+		if (!m_canRecord && m_readFile != "")	// streaming
+		{
+			if (!m_isPlayingStreaming)
+				m_zedCamera->setSVOPosition(m_lastImagePosition);
+		}
 		else if (m_canRecord && m_isRecording)	// enregistrement
+		{
 			m_zedCamera->record();
+		}
 	}
 }
 
@@ -106,9 +127,21 @@ void Camera::stopRecording()
 	m_isRecording = false;
 }
 
-void Camera::resetReading()
+void Camera::doStreamingAction(StreamingAction streamingAction)
 {
-	m_zedCamera->setSVOPosition(0);
+	m_isPlayingStreaming = streamingAction == StreamingAction::Play;
+
+	if (streamingAction == StreamingAction::GoToPreviousImage && m_zedCamera->getSVOPosition() > 0)
+		m_lastImagePosition = m_zedCamera->getSVOPosition() - 1;
+	else if (streamingAction == StreamingAction::GoToNextImage)
+		m_lastImagePosition = m_zedCamera->getSVOPosition() + 1;
+	else if (streamingAction == StreamingAction::Reload)
+		m_lastImagePosition = 0;
+	else
+		m_lastImagePosition = m_zedCamera->getSVOPosition();
+
+	if (streamingAction != StreamingAction::Play)
+		m_zedCamera->setSVOPosition(m_lastImagePosition);
 }
 
 void Camera::initialize(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE depthQuality, int maximumDepthDistance, const std::string& file)
@@ -133,7 +166,6 @@ void Camera::initialize(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE de
 		// on quitte le programmme en cas d'erreur
 		std::cout << errcode2str(err) << std::endl;
 		delete m_zedCamera;
-		std::cout << "Rage quit" << std::endl;
 		exit(1);
 	}
 

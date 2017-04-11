@@ -1,104 +1,52 @@
 #include <iostream>
-#include <thread>
-#include <sstream>
-#include "Camera.hpp"
-#include "Service.hpp"
-#include "FpsCounter.hpp"
+#include "ReadProgram.hpp"
+#include "RecordProgram.hpp"
+#include "Send2DMapProgram.hpp"
 
-int lineDepthFrame = 0;
-std::vector<std::vector<float>> lineDepth;
-
-bool add(beginner_tutorials::CamToAlg::Request  &req, beginner_tutorials::CamToAlg::Response &res)
-{
-	std::vector<float> depthLine(lineDepth[0].size(), 0);
-
-	for (int i = 0; i < depthLine.size(); ++i)
-	{
-		for (int j = 0; j < 20; ++j)
-		depthLine[i] += lineDepth[j][i];
-		depthLine[i] /= 20;
-	}
-
-	res.tranche = depthLine;
-	return true;
-}
 
 int main(int argc, char **argv)
 {
 	srand(time(0));
-
-	// Initialisation de l'affichage
-	bool isRecording = false;
-	std::string file = "test.svo";
-
-	Camera camera(sl::zed::ZEDResolution_mode::VGA, sl::zed::MODE::QUALITY, 10000);
-	int width = camera.getImageSize().width;
-	int height = camera.getImageSize().height;
-	cv::Size size(width, height); // taille de l'image
-
-	cv::Mat depthImage(size, CV_8UC1); // image de profondeur
-	cv::Mat colorImage(size, CV_8UC3); // image de profondeur
-
-
-	// Boucle d'affichage
-	bool firstFrame = true;
-	FpsCounter fpsCounter;
 	Service::init(argc, argv, "cam");
-	Service service("claques", add);
 
-	lineDepth = std::vector<std::vector<float>>(20, std::vector<float>(width, 0));
-
-	while (ros::ok()/* && !viewer.isEnded()*/)
+	if (argc < 2)
 	{
-		// Récupération des informations de la caméra
-		camera.update();
-		camera.getDepthImage().copyTo(depthImage);
-
-
-		// Récupération de la profondeur de la ligne horizontale centrale
-		for (int i = 0; i < width; ++i)
+		std::cerr << "Usage : " << argv[0] << " option [parameters]" << std::endl;
+		std::cerr << "Option can be : " << std::endl;
+		std::cerr << "\t- read : open an existing .svo file (parameters : file_to_open)" << std::endl;
+		std::cerr << "\t- record : record in a .svo file (parameters : record_file)" << std::endl;
+		std::cerr << "\t- send2dmap : send depth line from the camera (or file if specified) to a 2D reconstruction ROS node (parameters : [file_to_open])" << std::endl;
+	}
+	else
+	{
+		if (strcmp(argv[1], "read") == 0)
 		{
-			lineDepth[lineDepthFrame][i] =
-				camera.getDistanceOfGreyLevel(255 - depthImage.at<uchar>(cv::Point(4 * i, height / 2)));
+			if (argc != 3)
+				std::cerr << "Usage : " << argv[0] << " " << argv[1] << " file_to_open" << std::endl;
+			else
+				ReadProgram(argv[2]).execute();
 		}
-
-		lineDepthFrame = (lineDepthFrame + 1) % 20;
-
-
-		// Affichage des images
-		for (int i = 0; i < width; ++i)
-			depthImage.at<cv::Vec4b>(cv::Point(i, height / 2)) = cv::Vec4b(255, 0, 0, 255);
-
-		cv::imshow("Profondeur", depthImage);
-		//cv::imshow("Couleur", colorImage);
-
-
-		// Récupération des inputs
-		char key = cv::waitKey(5);
-		if (key == 'q')
-			break;
-		else if (key == 'r')
+		else if (strcmp(argv[1], "record") == 0)
 		{
-			if (!camera.canRecord())
-			{
-				camera.recreate(sl::zed::ZEDResolution_mode::VGA, sl::zed::MODE::QUALITY, 10000);
-				camera.enableRecording(file);
-			}
-			camera.startRecording();
+			if (argc != 3)
+				std::cerr << "Usage : " << argv[0] << " " << argv[1] << " record_file" << std::endl;
+			else
+				RecordProgram(argv[2]).execute();
 		}
-		else if (key == 's')
-			camera.stopRecording();
-		else if (key == 'l')
-			camera.recreate(sl::zed::ZEDResolution_mode::VGA, sl::zed::MODE::QUALITY, 10000, file);
-
-
-		// Calcul des FPS
-		firstFrame = false;
-		fpsCounter.update();
-		if (fpsCounter.isUpdated())
-			std::cout << "FPS : " << (int)fpsCounter.getFps() << std::endl;
+		else if (strcmp(argv[1], "send2dmap") == 0)
+		{
+			if (argc > 3)
+				std::cerr << "Usage : " << argv[0] << " " << argv[1] << " [file_to_open]" << std::endl;
+			else if (argc == 3)
+				Send2DMapProgram(argv[2]).execute();
+			else
+				Send2DMapProgram().execute();
+		}
+		else
+		{
+			std::cerr << "Unknown option \"" << argv[1] << "\"" << std::endl;
+		}
 	}
 
 	return 0;
 }
-
