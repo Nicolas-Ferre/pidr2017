@@ -1,7 +1,7 @@
 #include "ReadProgram.hpp"
 
 ReadProgram::ReadProgram(const std::string& file) :
-	AbstractProgram(sl::zed::ZEDResolution_mode::VGA, sl::zed::MODE::QUALITY, 10000, file),
+	AbstractProgram(sl::zed::ZEDResolution_mode::HD720, sl::zed::MODE::QUALITY, 10000, file),
 	m_colorImage(m_camera.getImageSize(), CV_8UC1),
 	m_depthImage(m_camera.getImageSize(), CV_8UC3)
 {

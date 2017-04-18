@@ -158,7 +158,7 @@ void Camera::initialize(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE de
 	if (file != "")
 		m_zedCamera = new sl::zed::Camera(file);
 	else
-		m_zedCamera = new sl::zed::Camera(sl::zed::ZEDResolution_mode::VGA);	// VGA, HD720, HD1080 ou HD2K
+		m_zedCamera = new sl::zed::Camera(resolution);	// VGA, HD720, HD1080 ou HD2K
 	sl::zed::ERRCODE err = m_zedCamera->init(m_parameters);
 
 	if (err != sl::zed::ERRCODE::SUCCESS)

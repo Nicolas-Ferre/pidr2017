@@ -1,7 +1,7 @@
 #include "RecordProgram.hpp"
 
 RecordProgram::RecordProgram(const std::string& file) :
-	AbstractProgram(sl::zed::ZEDResolution_mode::VGA, sl::zed::MODE::QUALITY, 10000),
+	AbstractProgram(sl::zed::ZEDResolution_mode::HD720, sl::zed::MODE::QUALITY, 10000),
 	m_colorImage(m_camera.getImageSize(), CV_8UC1),
 	m_depthImage(m_camera.getImageSize(), CV_8UC3)
 {
