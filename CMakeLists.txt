@@ -181,6 +181,7 @@ add_executable(
     src/ReadProgram.cpp
     src/RecordProgram.cpp
 	src/Send2DMapProgram.cpp
+    src/DetectCirclesProgram.cpp
 )
 
 add_dependencies(cam beginner_tutorials_gencpp)

@@ -25,6 +25,8 @@ public :
 
 	~Camera();
 
+	bool fileIsRead() const;
+
 	bool canRecord() const;
 
 	bool isRecording() const;
@@ -72,6 +74,7 @@ private:
 	bool m_isRecording;
 	sl::zed::InitParams m_parameters;
 	std::string m_readFile;
+	bool m_fileIsRead;
 	bool m_isPlayingStreaming;
 	int m_lastImagePosition;
 };

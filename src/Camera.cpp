@@ -5,6 +5,7 @@ Camera::Camera(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE depthQualit
 	m_canRecord(false),
 	m_isRecording(false),
 	m_readFile(readFile),
+	m_fileIsRead(readFile != ""),
 	m_isPlayingStreaming(false),
 	m_lastImagePosition(0)
 {
@@ -17,6 +18,11 @@ Camera::~Camera()
 		m_zedCamera->stopRecording();
 	if (m_zedCamera != nullptr)
 		delete m_zedCamera;
+}
+
+bool Camera::fileIsRead() const
+{
+	return m_fileIsRead;
 }
 
 bool Camera::canRecord() const
@@ -92,6 +98,9 @@ void Camera::recreate(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE dept
 	m_canRecord = false;
 	m_isRecording = false;
 	m_readFile = file;
+	m_fileIsRead = file != "";
+	m_isPlayingStreaming = false;
+	m_lastImagePosition = 0;
 	initialize(resolution, depthQuality, maximumDepthDistance, file);
 }
 

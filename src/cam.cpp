@@ -2,6 +2,7 @@
 #include "ReadProgram.hpp"
 #include "RecordProgram.hpp"
 #include "Send2DMapProgram.hpp"
+#include "DetectCirclesProgram.hpp"
 
 
 int main(int argc, char **argv)
@@ -16,6 +17,7 @@ int main(int argc, char **argv)
 		std::cerr << "\t- read : open an existing .svo file (parameters : file_to_open)" << std::endl;
 		std::cerr << "\t- record : record in a .svo file (parameters : record_file)" << std::endl;
 		std::cerr << "\t- send2dmap : send depth line from the camera (or file if specified) to a 2D reconstruction ROS node (parameters : [file_to_open])" << std::endl;
+		std::cerr << "\t- detect_circles : detect circles of a video or directy from the camera (parameters : [file_to_open])" << std::endl;
 	}
 	else
 	{
@@ -37,10 +39,15 @@ int main(int argc, char **argv)
 		{
 			if (argc > 3)
 				std::cerr << "Usage : " << argv[0] << " " << argv[1] << " [file_to_open]" << std::endl;
-			else if (argc == 3)
-				Send2DMapProgram(argv[2]).execute();
 			else
-				Send2DMapProgram().execute();
+				Send2DMapProgram(argc == 3 ? argv[2] : "").execute();
+		}
+		else if (strcmp(argv[1], "detect_circles") == 0)
+		{
+			if (argc > 3)
+				std::cerr << "Usage : " << argv[0] << " " << argv[1] << " [file_to_open]" << std::endl;
+			else
+				DetectCirclesProgram(argc == 3 ? argv[2] : "").execute();
 		}
 		else
 		{
