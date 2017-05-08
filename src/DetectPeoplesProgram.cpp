@@ -58,18 +58,22 @@ void DetectPeoplesProgram::computeFrame()
 	//Récuperation des images
 	m_camera.getLeftColorImage().copyTo(m_colorImage);
 	m_camera.getDepthImage().copyTo(m_depthImage);
-         cv::cvtColor(m_colorImage, m_grayImage, CV_BGR2GRAY);
-
+        cv::Mat smallImg;
+        cv::resize(m_colorImage, smallImg, cv::Size(640, 480));
+        cv::Mat sIB;
+         cv::cvtColor(smallImg, sIB, CV_BGR2GRAY);
+    
 
 	// Détection des personnes
- ;
+         
+
         bool loaded1 = detectorBody.load("haarcascade_fullbody.xml");
         
 
-        detectorBody.detectMultiScale(m_grayImage, human, 1.1, 2, 0 | 1, cv::Size(10,10), cv::Size(1200, 1200));
+        detectorBody.detectMultiScale(smallImg, human, 1.1, 1, 0 | 1, cv::Size(40,70), cv::Size(160, 600));
         if (human.size() > 0) {
         for (int gg = 0; gg < human.size(); gg++) {
-        rectangle(m_colorImage, human[gg].tl(), human[gg].br(), cv::Scalar(0,0,255), 2, 8, 0);
+        rectangle(smallImg, human[gg].tl(), human[gg].br(), cv::Scalar(0,0,255), 2, 8, 0);
         
             }
         }
@@ -136,7 +140,7 @@ void DetectPeoplesProgram::computeFrame()
 */
 	// Affichage
 // 	cv::imshow("Profondeur", m_depthImage);
-	cv::imshow("Niveaux de couleur", m_colorImage);
+	cv::imshow("Niveaux de couleur", smallImg);
 //	cv::imshow("Niveaux de gris", m_grayImage);
 // 	cv::imshow("Canny", m_cannyImage);
 }
