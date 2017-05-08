@@ -20,8 +20,8 @@ private:
 	cv::Mat m_grayImage;
 	cv::Mat m_cannyImage;
 	cv::Mat m_depthImage;
-//         CascadeClassifier detectorBody;
-//         vector<Rect> human;
+        cv::CascadeClassifier detectorBody;
+        std::vector<cv::Rect> human;
 	int m_detectionParameter1;
 	int m_detectionParameter2;
 };

@@ -53,26 +53,26 @@ void DetectPeoplesProgram::computeFrame()
 		else if (m_pressedKey == 'm') // arrêter la video et avancer d'une frame
 			m_camera.doStreamingAction(StreamingAction::GoToNextImage);
 	}
-// // // // // // // // // // // // // // // // // // // // // // // // // // 
+// // // // // // // // // // // // // // // // // // // // // // // // // 
 
-// 	// Récuperation des images
-// 	m_camera.getLeftColorImage().copyTo(m_colorImage);
-// 	m_camera.getDepthImage().copyTo(m_depthImage);
-// 
-// 
-// 	// Détection des personnes
-//  ;
-//         bool loaded1 = detectorBody.load("haarcascade_fullbody.xml");
-//         
-// 
-//         detectorBody.detectMultiScale(m_grayImage, human, 1.1, 2, 0 | 1, Size(40,70), Size(80, 300));
-//    if (human.size() > 0) {
-//     for (int gg = 0; gg < human.size(); gg++) {
-//     //rectangle(m_colorImage, human[gg].tl(), human[gg].br(), Scalar(0,0,255), 2, 8, 0);
-//         
-//     }
-//    }
-// // // // // // // // // // // // // // // // // // // // // // // // // // // 
+	//Récuperation des images
+	m_camera.getLeftColorImage().copyTo(m_colorImage);
+	m_camera.getDepthImage().copyTo(m_depthImage);
+
+
+	// Détection des personnes
+ ;
+        bool loaded1 = detectorBody.load("haarcascade_fullbody.xml");
+        
+
+        detectorBody.detectMultiScale(m_grayImage, human, 1.1, 2, 0 | 1, cv::Size(40,70), cv::Size(80, 300));
+        if (human.size() > 0) {
+        for (int gg = 0; gg < human.size(); gg++) {
+        rectangle(m_colorImage, human[gg].tl(), human[gg].br(), cv::Scalar(0,0,255), 2, 8, 0);
+        
+            }
+        }
+// // // // // // // // // // // // // // // // // // // // // // // // // // 
         
 	/*cv::cvtColor(m_colorImage, m_grayImage, CV_BGR2GRAY);
 	GaussianBlur(m_grayImage, m_grayImage, cv::Size(9, 9), 2, 2);
