@@ -182,6 +182,7 @@ add_executable(
     src/RecordProgram.cpp
 	src/Send2DMapProgram.cpp
     src/DetectCirclesProgram.cpp
+    src/DetectPeoplesProgram.cpp
 )
 
 add_dependencies(cam beginner_tutorials_gencpp)
@@ -272,7 +273,7 @@ FILE(GLOB_RECURSE SRC_FILES "${SRC_FOLDER}/*.cpp")
 
 set_property(TARGET ${execName} PROPERTY OUTPUT_NAME "ZED Save depth")
 
-add_definitions(-std=c++0x -g -O3)
+add_definitions(-std=c++11 -g -O3)
 target_link_libraries(cam ${catkin_LIBRARIES}
                         ${execName}
                         ${CMAKE_THREAD_LIBS_INIT}
