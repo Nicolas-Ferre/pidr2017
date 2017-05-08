@@ -5,8 +5,8 @@ DetectCirclesProgram::DetectCirclesProgram(const std::string& file) :
 	m_colorImage(m_camera.getImageSize(), CV_8UC1),
 	m_grayImage(m_camera.getImageSize(), CV_8UC1),
 	m_depthImage(m_camera.getImageSize(), CV_8UC3),
-	m_detectionParameter1(400),
-	m_detectionParameter2(10)   // accumulator threshold, if small, can create noises
+	m_detectionParameter1(320),
+	m_detectionParameter2(13)   // accumulator threshold, if small, can create noises
 {
 	std::cout << "Commands : " << std::endl;
 
@@ -61,14 +61,23 @@ void DetectCirclesProgram::computeFrame()
 
 	// Détection des cercles
 	cv::cvtColor(m_colorImage, m_grayImage, CV_BGR2GRAY);
+	//GaussianBlur(m_grayImage, m_grayImage, cv::Size(9, 9), 2, 2);
 	GaussianBlur(m_grayImage, m_grayImage, cv::Size(9, 9), 2, 2);
-	equalizeHist(m_grayImage, m_grayImage);
+	//equalizeHist(m_grayImage, m_grayImage);
 	Canny(m_grayImage, m_cannyImage, m_detectionParameter1 / 2, m_detectionParameter1);
 
 	std::vector<cv::Vec3f> circlesList;
 	cv::HoughCircles(m_grayImage, circlesList, CV_HOUGH_GRADIENT, 1, m_grayImage.rows / 8, m_detectionParameter1, m_detectionParameter2, 5, m_grayImage.rows / 8);
 
 	for(int i = 0; i < circlesList.size(); i++)
+	{
+		cv::Point center(cvRound(circlesList[i][0]), cvRound(circlesList[i][1]));
+		int radius = cvRound(circlesList[i][2]);
+
+		cv::circle(m_grayImage, center, radius, cv::Scalar(255,255,255), 3, 8, 0);
+	}
+
+	/*for(int i = 0; i < circlesList.size(); i++)
 	{
 		cv::Point center(cvRound(circlesList[i][0]), cvRound(circlesList[i][1]));
 		int radius = cvRound(circlesList[i][2]);
@@ -116,7 +125,7 @@ void DetectCirclesProgram::computeFrame()
 		else
 			cv::circle(m_grayImage, center, radius, cv::Scalar(255,255,255), 3, 8, 0);
 		cv::putText(m_grayImage, std::to_string(smallestDifference), center + cv::Point(radius, radius), cv::FONT_HERSHEY_COMPLEX_SMALL, 1, cv::Scalar(0,0,0), 1);
-	}
+	}*/
 
 
 	// Affichage

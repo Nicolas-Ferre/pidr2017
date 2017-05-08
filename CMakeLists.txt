@@ -182,6 +182,7 @@ add_executable(
     src/RecordProgram.cpp
 	src/Send2DMapProgram.cpp
     src/DetectCirclesProgram.cpp
+    src/DetectCircles2Program.cpp
     src/DetectPeoplesProgram.cpp
 )
 
