@@ -53,7 +53,6 @@ void DetectPeoplesProgram::computeFrame()
 		else if (m_pressedKey == 'm') // arrêter la video et avancer d'une frame
 			m_camera.doStreamingAction(StreamingAction::GoToNextImage);
 	}
-// // // // // // // // // // // // // // // // // // // // // // // // // 
 
 	//Récuperation des images
 	m_camera.getLeftColorImage().copyTo(m_colorImage);
@@ -68,79 +67,21 @@ void DetectPeoplesProgram::computeFrame()
          
 
         bool loaded1 = detectorBody.load("haarcascade_fullbody.xml");
-        
-
-        detectorBody.detectMultiScale(smallImg, human, 1.1, 1, 0 | 1, cv::Size(40,70), cv::Size(160, 600));
-        if (human.size() > 0) {
-        for (int gg = 0; gg < human.size(); gg++) {
-        rectangle(smallImg, human[gg].tl(), human[gg].br(), cv::Scalar(0,0,255), 2, 8, 0);
+        hog.setSVMDetector(cv::HOGDescriptor::getDefaultPeopleDetector());
+        hog.detectMultiScale(sIB, human2, 0, cv::Size(8,8), cv::Size(32, 32), 1.05, 2);
+        if (human2.size() > 0) {
+        for (int gg = 0; gg < human2.size(); gg++) {
+        rectangle(smallImg, human2[gg].tl(), human2[gg].br(), cv::Scalar(0,255,0), 2, 8, 0);
         
             }
         }
-// // // // // // // // // // // // // // // // // // // // // // // // // // 
+        detectorBody.detectMultiScale(sIB, human1, 1.1, 1, 0 | 1, cv::Size(40,70), cv::Size(160, 600));
+        if (human1.size() > 0) {
+        for (int gg = 0; gg < human1.size(); gg++) {
+        rectangle(smallImg, human1[gg].tl(), human1[gg].br(), cv::Scalar(0,0,255), 2, 8, 0);
         
-	/*cv::cvtColor(m_colorImage, m_grayImage, CV_BGR2GRAY);
-	GaussianBlur(m_grayImage, m_grayImage, cv::Size(9, 9), 2, 2);
-	equalizeHist(m_grayImage, m_grayImage);
-	Canny(m_grayImage, m_cannyImage, m_detectionParameter1 / 2, m_detectionParameter1);
-
-	std::vector<cv::Vec3f> circlesList;
-	cv::HoughCircles(m_grayImage, circlesList, CV_HOUGH_GRADIENT, 1, m_grayImage.rows / 8, m_detectionParameter1, m_detectionParameter2, 5, m_grayImage.rows / 8);
-
-	for(int i = 0; i < circlesList.size(); i++)
-	{
-		cv::Point center(cvRound(circlesList[i][0]), cvRound(circlesList[i][1]));
-		int radius = cvRound(circlesList[i][2]);
-		int circleGrayMean = 0;
-		int circleAroundGrayMean[4] = {0};
-		int circleGrayPixelCount = 0;
-		int circleAroundGrayPixelCount[4] = {0};
-
-		for (int x = center.x - radius; x < center.x + radius; ++x)
-		{
-			for (int y = center.y - radius; y < center.y + radius; ++y)
-			{
-				if (pow(center.x - x, 2) + pow(center.y - y, 2) < pow(radius, 2) && pow(center.x - x, 2) + pow(center.y - y, 2) > pow(radius / 2, 2))
-				{
-					circleGrayMean += m_grayImage.at<uchar>(cv::Point(x, y));
-					++circleGrayPixelCount;
-				}
-				else
-				{
-					int cornerId = 0;
-					if (x < center.x && y < center.y)
-						cornerId = 1;
-					else if (x > center.x && y < center.y)
-						cornerId = 2;
-					else if (x > center.x && y > center.y)
-						cornerId = 3;
-
-					circleAroundGrayMean[cornerId] += m_grayImage.at<uchar>(cv::Point(x, y));
-					++circleAroundGrayPixelCount[cornerId];
-				}
-			}
-		}
-
-		circleGrayMean /= circleGrayPixelCount;
-		for (int i = 0; i < 4; ++i)
-			circleAroundGrayMean[i] /= circleAroundGrayPixelCount[i];
-
-		int smallestDifference = INT_MAX;
-		for (int i = 0; i < 4; ++i)
-			if (abs(circleAroundGrayMean[i] - circleGrayMean) < smallestDifference)
-				smallestDifference = abs(circleAroundGrayMean[i] - circleGrayMean);
-
-		if (smallestDifference > 20)
-			cv::circle(m_grayImage, center, radius, cv::Scalar(0,0,0), 3, 8, 0);
-		else
-			cv::circle(m_grayImage, center, radius, cv::Scalar(255,255,255), 3, 8, 0);
-		cv::putText(m_grayImage, std::to_string(smallestDifference), center + cv::Point(radius, radius), cv::FONT_HERSHEY_COMPLEX_SMALL, 1, cv::Scalar(0,0,0), 1);
-	}
-
-*/
+            }
+        }
 	// Affichage
-// 	cv::imshow("Profondeur", m_depthImage);
 	cv::imshow("Niveaux de couleur", smallImg);
-//	cv::imshow("Niveaux de gris", m_grayImage);
-// 	cv::imshow("Canny", m_cannyImage);
 }

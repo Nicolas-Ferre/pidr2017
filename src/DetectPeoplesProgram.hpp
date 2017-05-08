@@ -21,7 +21,9 @@ private:
 	cv::Mat m_cannyImage;
 	cv::Mat m_depthImage;
         cv::CascadeClassifier detectorBody;
-        std::vector<cv::Rect> human;
+        cv::HOGDescriptor hog;
+        std::vector<cv::Rect> human1;
+        std::vector<cv::Rect> human2;
 	int m_detectionParameter1;
 	int m_detectionParameter2;
 };
