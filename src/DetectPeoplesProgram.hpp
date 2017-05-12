@@ -7,6 +7,7 @@
 #include "opencv2/objdetect.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
+#include "People.hpp"
 
 class DetectPeoplesProgram : public AbstractProgram
 {
@@ -24,6 +25,10 @@ private:
         cv::HOGDescriptor hog;
         std::vector<cv::Rect> human1;
         std::vector<cv::Rect> human2;
+
+        
+        int peopleNumber;
+        std::vector<People> peoples;
 	int m_detectionParameter1;
 	int m_detectionParameter2;
 };

@@ -3,7 +3,6 @@
 #include "RecordProgram.hpp"
 #include "Send2DMapProgram.hpp"
 #include "DetectCirclesProgram.hpp"
-#include "DetectCircles2Program.hpp"
 #include "DetectPeoplesProgram.hpp"
 
 
@@ -51,13 +50,6 @@ int main(int argc, char **argv)
 				std::cerr << "Usage : " << argv[0] << " " << argv[1] << " [file_to_open]" << std::endl;
 			else
 				DetectCirclesProgram(argc == 3 ? argv[2] : "").execute();
-		}
-		else if (strcmp(argv[1], "detect_circles_2") == 0)
-		{
-			if (argc > 3)
-				std::cerr << "Usage : " << argv[0] << " " << argv[1] << " [file_to_open]" << std::endl;
-			else
-				DetectCircles2Program(argc == 3 ? argv[2] : "").execute();
 		}
 		else if (strcmp(argv[1], "detect_peoples") == 0)
 		{
