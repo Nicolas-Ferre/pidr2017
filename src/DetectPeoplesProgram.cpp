@@ -123,7 +123,7 @@ void DetectPeoplesProgram::computeFrame()
         }
         
         for (int gg = 0;gg< human1.size();gg++){
-                cv::Point tmp=cv::Point((human2[gg].tl()+human2[gg].br())/2);
+                cv::Point tmp=cv::Point((human1[gg].tl()+human1[gg].br())/2);
                 for (int hh=0;hh<peoples.size();hh++){
                         if (human1[gg].contains(peoples[hh].getPos())){
                             peoples[hh].addFiability(20);
