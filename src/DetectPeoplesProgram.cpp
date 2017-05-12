@@ -107,8 +107,15 @@ void DetectPeoplesProgram::computeFrame()
                     break;
                 }
             }
+            bool contains=false;
+            for (int hh=0;hh<peoples.size();hh++){
+            if (cv::Rect(peoples[hh].getTl(),peoples[hh].getBr()).contains(tmp)){
+                contains=true;
+                break;
+            }
             
-            if (!exist){
+            }
+            if (!exist && !contains){
                 std::cout << "nb people "<< peopleNumber << std::endl;
                 People np=People("people number "/*+ std::to_string(peopleNumber)*/);
                 cv::Point npos=cv::Point(tmp.x,tmp.y);
