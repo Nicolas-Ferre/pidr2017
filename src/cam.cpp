@@ -4,6 +4,7 @@
 #include "Send2DMapProgram.hpp"
 #include "DetectCirclesProgram.hpp"
 #include "DetectPeoplesProgram.hpp"
+#include "SendPeopleProgram.hpp"
 
 
 int main(int argc, char **argv)
@@ -57,6 +58,13 @@ int main(int argc, char **argv)
 				std::cerr << "Usage : " << argv[0] << " " << argv[1] << " [file_to_open]" << std::endl;
 			else
 				DetectPeoplesProgram(argc == 3 ? argv[2] : "").execute();
+		}
+		else if (strcmp(argv[1], "send_people") == 0)
+		{
+			if (argc > 3)
+				std::cerr << "Usage : " << argv[0] << " " << argv[1] << " [file_to_open]" << std::endl;
+			else
+				SendPeopleProgram(argc == 3 ? argv[2] : "").execute();
 		}
 		else
 		{

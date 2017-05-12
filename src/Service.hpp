@@ -4,6 +4,7 @@
 #include <thread>
 #include "ros/ros.h"
 #include "beginner_tutorials/CamToAlg.h"
+#include "beginner_tutorials/CamToAlgPeople.h"
 #include "AbstractProgram.hpp"
 
 

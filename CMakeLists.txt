@@ -55,6 +55,7 @@ find_package(catkin REQUIRED COMPONENTS
    FILES
    AddTwoInts.srv
    CamToAlg.srv
+   CamToAlgPeople.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -184,6 +185,7 @@ add_executable(
     src/DetectCirclesProgram.cpp
     src/DetectPeoplesProgram.cpp
     src/People.cpp
+    src/SendPeopleProgram.cpp
 )
 
 add_dependencies(cam beginner_tutorials_gencpp)
