@@ -51,6 +51,8 @@ public :
 
 	CUcontext getCudaContext() const;
 
+	int getCurrentImageId() const;
+
 	void recreate(sl::zed::ZEDResolution_mode resolution = sl::zed::ZEDResolution_mode::VGA,
 		sl::zed::MODE depthQuality = sl::zed::MODE::QUALITY, int maximumDepthDistance = 10000, const std::string& file = "");
 

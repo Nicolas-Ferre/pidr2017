@@ -20,6 +20,8 @@ protected:
 	Camera m_camera;
 	FpsCounter m_fpsCounter;
 	char m_pressedKey;
+	int m_oldImageId;
+	bool m_imageHaveChanged;
 };
 
 #endif

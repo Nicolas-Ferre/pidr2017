@@ -40,7 +40,7 @@ public:
 
 	void computeFrame();
 
-	static std::vector<People> getPeople(DetectPeople& detection, const cv::Mat& colorImage, const cv::Mat& depthImage);
+	static std::vector<People> getPeople(DetectPeople& detection, const cv::Mat& colorImage);
 
 private:
 	cv::Mat m_colorImage;

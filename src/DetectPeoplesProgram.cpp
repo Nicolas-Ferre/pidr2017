@@ -25,12 +25,10 @@ DetectPeoplesProgram::DetectPeoplesProgram(const std::string& file) :
 	std::cout << "\t- q : exit" << std::endl;
 }
 
-std::vector<People> DetectPeoplesProgram::getPeople(DetectPeople& detection, const cv::Mat& colorImage, const cv::Mat& depthImage)
+std::vector<People> DetectPeoplesProgram::getPeople(DetectPeople& detection, const cv::Mat& colorImage)
 {
-	cv::Mat smallImg;
-	cv::resize(colorImage, smallImg, cv::Size(640, 480));
 	cv::Mat sIB;
-	cv::cvtColor(smallImg, sIB, CV_BGR2GRAY);
+	cv::cvtColor(colorImage, sIB, CV_BGR2GRAY);
 
 	detection.hog.detectMultiScale(sIB, detection.human2, 0, cv::Size(8,8), cv::Size(32, 32), 1.05, 2);
 	detection.detectorBody.detectMultiScale(sIB, detection.human1, 1.1, 1, 0 | 1, cv::Size(40,70), cv::Size(160, 600));
@@ -65,7 +63,7 @@ std::vector<People> DetectPeoplesProgram::getPeople(DetectPeople& detection, con
 		}
 		if (!exist && !contains){
 			std::cout << "nb people "<< detection.peopleNumber << std::endl;
-			People np=People("people number "/*+ std::to_string(detection.peopleNumber)*/);
+			People np=People("people number " + std::to_string(detection.peopleNumber));
 			cv::Point npos=cv::Point(tmp.x,tmp.y);
 			cv::Point nspd=cv::Point(0,0);
 			np.setSpeed(nspd);

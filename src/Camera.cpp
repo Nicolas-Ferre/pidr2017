@@ -89,6 +89,11 @@ CUcontext Camera::getCudaContext() const
 	return m_zedCamera->getCUDAContext();
 }
 
+int Camera::getCurrentImageId() const
+{
+	return m_zedCamera->getSVOPosition();
+}
+
 void Camera::recreate(sl::zed::ZEDResolution_mode resolution, sl::zed::MODE depthQuality, int maximumDepthDistance, const std::string& file)
 {
 	if (m_canRecord)
