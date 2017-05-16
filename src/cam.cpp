@@ -1,4 +1,86 @@
 #include <iostream>
+#include <zed/Camera.hpp>
+
+#define DEPTH_CLAMP_VALUE 10000
+
+sl::zed::Camera* getCamera()
+{
+	// Initialisation des parametres
+	sl::zed::InitParams parameters;
+	parameters.mode = sl::zed::MODE::QUALITY;	// NONE, PERFORMANCE, MEDIUM ou QUALITY
+	parameters.unit = sl::zed::UNIT::MILLIMETER;
+	parameters.verbose = 1;
+	parameters.device = 0;
+
+	// Initialisation de la camera
+	sl::zed::Camera* zedCamera = new sl::zed::Camera(sl::zed::ZEDResolution_mode::VGA);	// VGA, HD720, HD1080 ou HD2K
+	sl::zed::ERRCODE err = zedCamera->init(parameters);
+
+	if (err != sl::zed::ERRCODE::SUCCESS)
+	{
+		// on quitte le programmme en cas d'erreur
+		std::cout << errcode2str(err) << std::endl;
+		delete zedCamera;
+		exit(1);
+	}
+
+	zedCamera->setDepthClampValue(DEPTH_CLAMP_VALUE);
+	return zedCamera;
+}
+
+int main(int argc, char **argv)
+{
+	// Initialisation de l'affichage
+	sl::zed::Camera* zedCamera = getCamera();
+	int width = zedCamera->getImageSize().width;
+	int height = zedCamera->getImageSize().height;
+	cv::Size size(width, height); // taille de l'image
+
+	cv::Mat depthImage(size, CV_8UC1); // image de profondeur
+	cv::Mat colorLeftImage(size, CV_8UC4); // image avec le mouvement en couleur
+	cv::Mat colorRightImage(size, CV_8UC4); // image avec le mouvement en couleur
+
+	// Boucle d'affichage
+	bool programShouldBeClosed = false;
+	int count = 0;
+	clock_t beginTime = clock();
+	clock_t totalTime = 0;
+	float fps = 0;
+
+	while (!programShouldBeClosed)
+	{
+		zedCamera->grab(sl::zed::SENSING_MODE::STANDARD);
+		slMat2cvMat(zedCamera->normalizeMeasure(sl::zed::MEASURE::DEPTH)).copyTo(depthImage);
+		slMat2cvMat(zedCamera->retrieveImage(sl::zed::SIDE::LEFT)).copyTo(colorLeftImage);
+		slMat2cvMat(zedCamera->retrieveImage(sl::zed::SIDE::RIGHT)).copyTo(colorRightImage);
+
+		// Récupération des inputs
+		char key = cv::waitKey(5);
+		if (key == 'q')
+			programShouldBeClosed = true;
+
+		// Calcul des FPS
+		totalTime += clock() - beginTime;
+
+		if (++count % 100 == 0)
+		{
+			std::cout << 10000 * CLOCKS_PER_SEC / totalTime  << std::endl;
+			beginTime = clock();
+			totalTime = 0;
+		}
+
+		cv::imshow("Couleur gauche", colorLeftImage);
+		cv::imshow("Couleur droite", colorRightImage);
+		cv::imshow("Profondeur", depthImage);
+	}
+
+	delete zedCamera;
+	return 0;
+}
+
+
+
+/*#include <iostream>
 #include "ReadProgram.hpp"
 #include "RecordProgram.hpp"
 #include "Send2DMapProgram.hpp"
@@ -74,3 +156,4 @@ int main(int argc, char **argv)
 
 	return 0;
 }
+*/
