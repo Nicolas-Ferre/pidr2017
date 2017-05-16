@@ -33,7 +33,7 @@ void Send2DMapProgram::computeFrame()
 
 	// Surlignage de la ligne récupérée sur l'image de profondeur
 	for (int i = 0; i < m_camera.getImageSize().width; ++i)
-		m_depthImage.at<cv::Vec4b>(cv::Point(i, m_camera.getImageSize().height / 2)) = cv::Vec4b(255, 0, 0, 255);
+		m_depthImage.at<cv::Vec4b>(cv::Point(i, m_camera.getImageSize().height / 2 - 80)) = cv::Vec4b(255, 0, 0, 255);
 
 
 	// Afichage
@@ -45,6 +45,12 @@ bool Send2DMapProgram::add(beginner_tutorials::CamToAlg::Request &req, beginner_
 {
 	if (s_send2DMapObjectToTreat != nullptr)
 	{
+		res.fx = s_send2DMapObjectToTreat->m_camera.m_zedCamera->getParameters()->LeftCam.fx;
+		res.fy = s_send2DMapObjectToTreat->m_camera.m_zedCamera->getParameters()->LeftCam.fy;
+		res.cx = s_send2DMapObjectToTreat->m_camera.m_zedCamera->getParameters()->LeftCam.cx;
+		res.cy = s_send2DMapObjectToTreat->m_camera.m_zedCamera->getParameters()->LeftCam.cy;
+		res.posy = s_send2DMapObjectToTreat->m_camera.getImageSize().height / 2 - 80;
+
 		std::vector<float> depthLineMean(s_send2DMapObjectToTreat->m_depthLine[0].size(), 0);
 
 		for (int i = 0; i < depthLineMean.size(); ++i)

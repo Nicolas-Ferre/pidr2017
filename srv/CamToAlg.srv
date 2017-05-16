@@ -1,3 +1,8 @@
 int32 sendData
 ---
 float32[] tranche
+float32 fx
+float32 fy
+float32 cx
+float32 cy
+float32 posy

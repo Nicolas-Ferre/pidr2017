@@ -2,6 +2,7 @@
 #define _SEND2DMAPPROGRAM
 
 #include <iostream>
+#include <zed/Camera.hpp>
 #include "AbstractProgram.hpp"
 #include "Service.hpp"
 

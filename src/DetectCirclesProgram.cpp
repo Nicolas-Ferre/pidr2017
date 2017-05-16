@@ -1,5 +1,8 @@
 #include "DetectCirclesProgram.hpp"
 
+int DetectCirclesProgram::detectionParameter1 = 70;
+int DetectCirclesProgram::detectionParameter2 = 5;
+
 DetectCirclesProgram::DetectCirclesProgram(const std::string& file) :
 	AbstractProgram(sl::zed::ZEDResolution_mode::HD720, sl::zed::MODE::QUALITY, 10000, file),
 	m_colorImage(m_camera.getImageSize(), CV_8UC1),
@@ -65,14 +68,22 @@ float DetectCirclesProgram::getCircleDepthDifference(const cv::Mat &depthImage, 
 
 std::vector<cv::Vec3f> DetectCirclesProgram::getBalls(const cv::Mat& colorImage, const cv::Mat& depthImage)
 {
-	const int detectionParameter1 = 200;
-	const int detectionParameter2 = 5; // accumulator threshold, if small, can create noises
+	static cv::Mat cannyImage;
+	static cv::Mat grayImage;
 
-	cv::Mat grayImage;
 	cv::cvtColor(colorImage, grayImage, CV_BGR2GRAY);
+	equalizeHist(grayImage, grayImage);
 	GaussianBlur(grayImage, grayImage, cv::Size(9, 9), 2, 2);
 
+
+	const int ratio = 2;
+	const int lowThreshold = detectionParameter1;
+	Canny(grayImage, cannyImage, detectionParameter1 / 2, detectionParameter1);
+	cv::imshow("Canny", cannyImage);
+	cv::imshow("Gray", grayImage);
+
 	std::vector<cv::Vec3f> ballsList;
+	std::cout << detectionParameter1 << " / " << detectionParameter2 << std::endl;
 	cv::HoughCircles(grayImage, ballsList, CV_HOUGH_GRADIENT, 1, grayImage.rows / 8, detectionParameter1, detectionParameter2, 5, grayImage.rows / 8);
 
 	// Elimination des faux positifs
@@ -94,7 +105,7 @@ std::vector<cv::Vec3f> DetectCirclesProgram::getBalls(const cv::Mat& colorImage,
 
 void DetectCirclesProgram::computeFrame()
 {
-	if (m_imageHaveChanged)
+	//if (m_imageHaveChanged)
 	{
 		// Récuperation des images
 		m_camera.getLeftColorImage().copyTo(m_colorImage);
@@ -118,7 +129,7 @@ void DetectCirclesProgram::computeFrame()
 
 
 		// Affichage
-		cv::imshow("Profondeur", m_depthImage);
+		//cv::imshow("Profondeur", m_depthImage);
 		cv::imshow("Niveaux de gris", m_colorImage);
 	}
 
@@ -136,4 +147,13 @@ void DetectCirclesProgram::computeFrame()
 		else if (m_pressedKey == 'm') // arrêter la video et avancer d'une frame
 			m_camera.doStreamingAction(StreamingAction::GoToNextImage);
 	}
+
+	if (m_pressedKey == 'u')
+		--detectionParameter1;
+	else if (m_pressedKey == 'i')
+		++detectionParameter1;
+	else if (m_pressedKey == 'j')
+		--detectionParameter2;
+	else if (m_pressedKey == 'k')
+		++detectionParameter2;
 }

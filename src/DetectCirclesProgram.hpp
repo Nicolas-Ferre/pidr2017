@@ -20,6 +20,9 @@ public:
 private:
 	cv::Mat m_colorImage;
 	cv::Mat m_depthImage;
+
+	static int detectionParameter1;
+	static int detectionParameter2; // accumulator threshold, if small, can create noises
 };
 
 #endif

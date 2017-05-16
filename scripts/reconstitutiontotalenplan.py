@@ -33,7 +33,7 @@ def algo():
         if i==50:
             i=0
             takepicture(x,y,angle)
-            angle=(angle+np.pi/2)%(2*np.pi)
+            #angle=(angle+np.pi/2)%(2*np.pi)
             print("ok")
             
 
@@ -55,13 +55,28 @@ def takepicture(x,y,theta):
     x1=[];
     y1=[];
     lgt=len(data.tranche);
+    fx=data.fx
+    fy=data.fy
+    cx=data.cx
+    cy=data.cy
+    posy=data.posy
     i=0;
     for fl in data.tranche:
-        if fl<7.5:
-            xt.append(x+(-fl*np.cos(35/180*np.pi+np.pi*i*110/(lgt*180)+35./180*np.pi + theta)));
-            yt.append(y+(fl*np.sin(35/180*np.pi+np.pi*i*110/(lgt*180)+35./180*np.pi + theta)));
+        if 0<fl<10:
+            X = (i - cx) * fl / fx
+            Y = fl
+
+            #if X*X + Y*Y < 100 :
+            xt.append(x + (i - cx) * fl / fx)
+            yt.append(y + fl)
+            print ("====> ",i, " / ",cx, " / ",fl, " / ",fx,",",((i - cx) * fl / fx))
+
+
+            #xt.append(x+(-fl*np.cos(35/180*np.pi+np.pi*i*110/(lgt*180)+35./180*np.pi + theta)));
+            #yt.append(y+(fl*np.sin(35/180*np.pi+np.pi*i*110/(lgt*180)+35./180*np.pi + theta)));
         i=i+1;
-    pl.plot(xt,yt,'bo');
+    pl.plot(xt,yt,'bo',color="blue");
+    pl.plot(0, 0,'bo',color="red");
     pl.draw();
     pl.savefig('./capture/alldone', dpi=300)
     pl.close()

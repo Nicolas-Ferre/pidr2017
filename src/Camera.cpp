@@ -55,7 +55,7 @@ int Camera::getMaximumDepthDistance() const
 
 float Camera::getDistanceOfGreyLevel(int grayLevel) const
 {
-	return grayLevel / 255. * getMaximumDepthDistance();
+	return grayLevel / 255. * (getMaximumDepthDistance() - 0.5) + 0.5;
 }
 
 cv::Mat Camera::getLeftColorImage() const
