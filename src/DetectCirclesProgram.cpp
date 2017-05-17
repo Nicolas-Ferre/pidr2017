@@ -1,7 +1,7 @@
 #include "DetectCirclesProgram.hpp"
 
-int DetectCirclesProgram::detectionParameter1 = 70;
-int DetectCirclesProgram::detectionParameter2 = 5;
+int DetectCirclesProgram::detectionParameter1 = 311;
+int DetectCirclesProgram::detectionParameter2 = 29;
 
 DetectCirclesProgram::DetectCirclesProgram(const std::string& file) :
 	AbstractProgram(sl::zed::ZEDResolution_mode::HD720, sl::zed::MODE::QUALITY, 10000, file),
@@ -94,7 +94,7 @@ std::vector<cv::Vec3f> DetectCirclesProgram::getBalls(const cv::Mat& colorImage,
 		float depthDifference = getCircleDepthDifference(depthImage, center, radius);
 
 		if (getCircleDepthErrorRatio(depthImage, center, radius) > 0.2  // si le cercle contient plus de 20% de profondeurs à 0
-			 || depthDifference > 4) // si la difference de profondeur dans le cercle est trop importante
+			 || depthDifference > 10) // si la difference de profondeur dans le cercle est trop importante
 		{
 			ballsList.erase(ballsList.begin() + i);
 		}
@@ -130,7 +130,7 @@ void DetectCirclesProgram::computeFrame()
 
 		// Affichage
 		//cv::imshow("Profondeur", m_depthImage);
-		cv::imshow("Niveaux de gris", m_colorImage);
+		cv::imshow("Couleur", m_colorImage);
 	}
 
 	// Récupération des entrées utilisateur

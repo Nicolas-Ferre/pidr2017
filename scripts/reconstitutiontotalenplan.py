@@ -63,9 +63,6 @@ def takepicture(x,y,theta):
     i=0;
     for fl in data.tranche:
         if 0<fl<10:
-            X = (i - cx) * fl / fx
-            Y = fl
-
             #if X*X + Y*Y < 100 :
             xt.append(x + (i - cx) * fl / fx)
             yt.append(y + fl)

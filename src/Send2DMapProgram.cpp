@@ -33,12 +33,23 @@ void Send2DMapProgram::computeFrame()
 
 	// Surlignage de la ligne récupérée sur l'image de profondeur
 	for (int i = 0; i < m_camera.getImageSize().width; ++i)
-		m_depthImage.at<cv::Vec4b>(cv::Point(i, m_camera.getImageSize().height / 2 - 80)) = cv::Vec4b(255, 0, 0, 255);
+		m_depthImage.at<cv::Vec4b>(cv::Point(i, m_camera.getImageSize().height / 2)) = cv::Vec4b(255, 0, 0, 255);
 
 
 	// Afichage
 	cv::imshow("Profondeur", m_depthImage);
 	cv::imshow("Couleur", m_colorImage);
+
+	if (m_pressedKey == 'p' && !m_camera.isPlayingStreaming()) // lancer la video
+		m_camera.doStreamingAction(StreamingAction::Play);
+	else if (m_pressedKey == 'p' && m_camera.isPlayingStreaming()) // arrêter la video
+		m_camera.doStreamingAction(StreamingAction::Pause);
+	else if (m_pressedKey == 'r') // relancer la video
+		m_camera.doStreamingAction(StreamingAction::Reload);
+	else if (m_pressedKey == 'l') // arrêter la video et revenir d'une frame
+		m_camera.doStreamingAction(StreamingAction::GoToPreviousImage);
+	else if (m_pressedKey == 'm') // arrêter la video et avancer d'une frame
+		m_camera.doStreamingAction(StreamingAction::GoToNextImage);
 }
 
 bool Send2DMapProgram::add(beginner_tutorials::CamToAlg::Request &req, beginner_tutorials::CamToAlg::Response &res)
@@ -49,7 +60,7 @@ bool Send2DMapProgram::add(beginner_tutorials::CamToAlg::Request &req, beginner_
 		res.fy = s_send2DMapObjectToTreat->m_camera.m_zedCamera->getParameters()->LeftCam.fy;
 		res.cx = s_send2DMapObjectToTreat->m_camera.m_zedCamera->getParameters()->LeftCam.cx;
 		res.cy = s_send2DMapObjectToTreat->m_camera.m_zedCamera->getParameters()->LeftCam.cy;
-		res.posy = s_send2DMapObjectToTreat->m_camera.getImageSize().height / 2 - 80;
+		res.posy = s_send2DMapObjectToTreat->m_camera.getImageSize().height / 2;
 
 		std::vector<float> depthLineMean(s_send2DMapObjectToTreat->m_depthLine[0].size(), 0);
 
