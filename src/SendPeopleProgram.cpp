@@ -48,8 +48,8 @@ void SendPeopleProgram::computeFrame()
 		for (int i = 0; i < detectedBalls.size(); ++i)
 		{
 			cv::Vec2f objectPosition = getReal2DPosition(cv::Point(detectedBalls[i][0], detectedBalls[i][1]));
-			s_peoplePositions.push_back(objectPosition[0]);
-			s_peoplePositions.push_back(objectPosition[1]);
+			s_ballsPositions.push_back(objectPosition[0]);
+			s_ballsPositions.push_back(objectPosition[1]);
 			cv::circle(m_colorImage, cv::Point(detectedBalls[i][0], detectedBalls[i][1]), 4, cv::Scalar(0, 255, 0), 2, 8, 0);
 		}
 
