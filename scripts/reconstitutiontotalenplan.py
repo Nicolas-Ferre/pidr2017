@@ -66,12 +66,14 @@ def takepicture(x,y,theta):
             #if X*X + Y*Y < 100 :
             xt.append(x + (i - cx) * fl / fx)
             yt.append(y + fl)
-            print ("====> ",i, " / ",cx, " / ",fl, " / ",fx,",",((i - cx) * fl / fx))
+            #print ("====> ",i, " / ",cx, " / ",fl, " / ",fx,",",((i - cx) * fl / fx))
 
 
             #xt.append(x+(-fl*np.cos(35/180*np.pi+np.pi*i*110/(lgt*180)+35./180*np.pi + theta)));
             #yt.append(y+(fl*np.sin(35/180*np.pi+np.pi*i*110/(lgt*180)+35./180*np.pi + theta)));
         i=i+1;
+    pl.xlabel('position x (en metres)')
+    pl.ylabel('position y (en metres)')
     pl.plot(xt,yt,'bo',color="blue");
     pl.plot(0, 0,'bo',color="red");
     pl.draw();

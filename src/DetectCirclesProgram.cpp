@@ -79,8 +79,8 @@ std::vector<cv::Vec3f> DetectCirclesProgram::getBalls(const cv::Mat& colorImage,
 	const int ratio = 2;
 	const int lowThreshold = detectionParameter1;
 	Canny(grayImage, cannyImage, detectionParameter1 / 2, detectionParameter1);
-	cv::imshow("Canny", cannyImage);
-	cv::imshow("Gray", grayImage);
+	//cv::imshow("Canny", cannyImage);
+	//cv::imshow("Gray", grayImage);
 
 	std::vector<cv::Vec3f> ballsList;
 	std::cout << detectionParameter1 << " / " << detectionParameter2 << std::endl;
