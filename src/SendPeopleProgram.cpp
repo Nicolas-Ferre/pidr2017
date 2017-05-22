@@ -33,7 +33,7 @@ void SendPeopleProgram::computeFrame()
 		{
 			if (detectedPeople[i].getTl().x != detectedPeople[i].getBr().x && detectedPeople[i].getTl().y != detectedPeople[i].getBr().y)
 			{
-				cv::Vec2f objectPosition = getReal2DPosition(detectedPeople[i].getPos());
+				cv::Vec3f objectPosition = getReal2DPosition(detectedPeople[i].getPos());
 				s_peoplePositions.push_back(objectPosition[0]);
 				s_peoplePositions.push_back(objectPosition[1]);
 				cv::circle(m_colorImage, detectedPeople[i].getPos(), 4, cv::Scalar(0, 0, 255), 2, 8, 0);
@@ -47,9 +47,10 @@ void SendPeopleProgram::computeFrame()
 
 		for (int i = 0; i < detectedBalls.size(); ++i)
 		{
-			cv::Vec2f objectPosition = getReal2DPosition(cv::Point(detectedBalls[i][0], detectedBalls[i][1]));
+			cv::Vec3f objectPosition = getReal2DPosition(cv::Point(detectedBalls[i][0], detectedBalls[i][1]));
 			s_ballsPositions.push_back(objectPosition[0]);
 			s_ballsPositions.push_back(objectPosition[1]);
+			s_ballsPositions.push_back(objectPosition[2]);
 			cv::circle(m_colorImage, cv::Point(detectedBalls[i][0], detectedBalls[i][1]), 4, cv::Scalar(0, 255, 0), 2, 8, 0);
 		}
 
@@ -93,11 +94,13 @@ float SendPeopleProgram::getObjectDistance(cv::Point peoplePosition)
 	return m_camera.getDistanceOfGreyLevel(255 - m_depthImage.at<cv::Vec4b>(peoplePosition)[0]);
 }
 
-cv::Vec2f SendPeopleProgram::getReal2DPosition(cv::Point positionInScreen)
+cv::Vec3f SendPeopleProgram::getReal2DPosition(cv::Point positionInScreen)
 {
-	float peopleDistance = getObjectDistance(positionInScreen);
-	float xImagePosition = m_colorImage.size().width - positionInScreen.x;
-	float angle = xImagePosition / m_colorImage.size().width * 110. / 180. * M_PI + 35. / 180. * M_PI;
+	float fx = m_camera.m_zedCamera->getParameters()->LeftCam.fx;
+	float fy = m_camera.m_zedCamera->getParameters()->LeftCam.fy;
+	float cx = m_camera.m_zedCamera->getParameters()->LeftCam.cx;
+	float cy = m_camera.m_zedCamera->getParameters()->LeftCam.cy;
 
-	return peopleDistance * cv::Vec2f(cos(angle), sin(angle));
+	float depth = getObjectDistance(positionInScreen);
+	return cv::Vec3f((1.0f * positionInScreen.x * m_camera.getImageSize().width / m_colorImage.size().width - cx) * depth / fx, depth, (1.0f * positionInScreen.y * m_camera.getImageSize().height / m_colorImage.size().height - cy) * depth / fy);
 }

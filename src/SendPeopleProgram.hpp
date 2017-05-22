@@ -20,7 +20,7 @@ private:
 
 	static bool add(beginner_tutorials::CamToAlgPeople::Request &req, beginner_tutorials::CamToAlgPeople::Response &res);
 
-	cv::Vec2f getReal2DPosition(cv::Point positionInScreen);
+	cv::Vec3f getReal2DPosition(cv::Point positionInScreen);
 
 	cv::Mat m_colorImage;
 	cv::Mat m_depthImage;

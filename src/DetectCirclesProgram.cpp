@@ -1,5 +1,8 @@
 #include "DetectCirclesProgram.hpp"
 
+//int DetectCirclesProgram::detectionParameter1 = 342;
+//int DetectCirclesProgram::detectionParameter2 = 6;
+
 int DetectCirclesProgram::detectionParameter1 = 311;
 int DetectCirclesProgram::detectionParameter2 = 29;
 
@@ -79,7 +82,7 @@ std::vector<cv::Vec3f> DetectCirclesProgram::getBalls(const cv::Mat& colorImage,
 	const int ratio = 2;
 	const int lowThreshold = detectionParameter1;
 	Canny(grayImage, cannyImage, detectionParameter1 / 2, detectionParameter1);
-	//cv::imshow("Canny", cannyImage);
+	cv::imshow("Canny", cannyImage);
 	//cv::imshow("Gray", grayImage);
 
 	std::vector<cv::Vec3f> ballsList;

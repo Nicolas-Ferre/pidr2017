@@ -11,8 +11,11 @@ class Robot :
 
     def __init__(self) :
         rospy.init_node('robot_controller', anonymous=True)
-        self.left_motor_publisher = rospy.Publisher('/leftMotorSpeed', Float32, queue_size=10)
+        self.pos_x_publisher = rospy.Publisher('/ballPosX', Float32, queue_size=10)
+        self.pos_y_publisher = rospy.Publisher('/ballPosY', Float32, queue_size=10)
+        self.pos_z_publisher = rospy.Publisher('/ballPosZ', Float32, queue_size=10)
         self.right_motor_publisher = rospy.Publisher('/rightMotorSpeed', Float32, queue_size=10)
+        self.left_motor_publisher = rospy.Publisher('/leftMotorSpeed', Float32, queue_size=10)
         self.pos_x_subscriber = rospy.Subscriber('/robotPosX', Float32, self.pos_x_callback)
         self.pos_y_subscriber = rospy.Subscriber('/robotPosY', Float32, self.pos_y_callback)
         self.angle_subscriber = rospy.Subscriber('/robotAngle', Float32, self.angle_callback)
@@ -21,6 +24,7 @@ class Robot :
         self.angle = 0
         self.goal_x = 0.1
         self.goal_y = 0.1
+        self.goal_z = -10
         self.rate = rospy.Rate(100)
 
     def get_angle(self,x1, y1, x2, y2) :
@@ -40,23 +44,23 @@ class Robot :
 
     def loop(self) :
         self.load_goal_position()
-        left_motor_speed = math.pi
-        right_motor_speed = math.pi
+        left_motor_speed = math.pi * 2
+        right_motor_speed = math.pi * 2
         delta_angle = self.get_angle(cos(self.angle), sin(self.angle), self.goal_x - self.pos_x, self.goal_y - self.pos_y)
-        print(delta_angle)
 
         if self.get_distance() < 0.1 :
             left_motor_speed = 0
             right_motor_speed = 0
         if delta_angle < 0 :
-            print "left"
             right_motor_speed = right_motor_speed / delta_angle / 10
         elif delta_angle > 0 :
-            print "right"
             left_motor_speed = left_motor_speed / delta_angle / 10
 
         self.left_motor_publisher.publish(left_motor_speed)
         self.right_motor_publisher.publish(right_motor_speed)
+        self.pos_x_publisher.publish(self.goal_x)
+        self.pos_y_publisher.publish(self.goal_y)
+        self.pos_z_publisher.publish(-self.goal_z)
         self.rate.sleep()
 
     def load_goal_position(self):
@@ -65,10 +69,10 @@ class Robot :
             people = rospy.ServiceProxy('people', CamToAlgPeople)
             resp =people(1)
             lgt=len(resp.positions);
-            if lgt >= 2 :
+            if lgt >= 3 :
                 self.goal_x = resp.positions[0]
-                self.goal_y = resp.positions[1]/4
-                print (self.goal_x, self.goal_y)
+                self.goal_y = resp.positions[1]
+                self.goal_z = resp.positions[2]
         except rospy.ServiceException, e:
             print "Service call failed: %s"%e
 
@@ -82,8 +86,6 @@ class Robot :
         self.angle = data.data
 
     def update(self) :
-        #self.left_motor_publisher.publish(10)
-        #self.right_motor_publisher.publish(5)
         self.loop()
         print(self.pos_x, "; ", self.pos_y, "; ", self.angle)
 
